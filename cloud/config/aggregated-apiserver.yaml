@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deviceapi-apiserver
+  namespace: default
+  labels:
+    api: deviceapi
+    apiserver: "true"
+spec:
+  selector:
+    matchLabels:
+      api: deviceapi
+      apiserver: "true"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        api: deviceapi
+        apiserver: "true"
+    spec:
+      containers:
+      - name: apiserver
+        image: 10.10.101.109:5000/apiserver:latest
+        volumeMounts:
+        - name: apiserver-certs
+          mountPath: /apiserver.local.config/certificates
+          readOnly: true
+        command:
+        - "./apiserver"
+        args:
+        - "--etcd-servers=http://etcd-svc:2379"
+        - "--tls-cert-file=/apiserver.local.config/certificates/tls.crt"
+        - "--tls-private-key-file=/apiserver.local.config/certificates/tls.key"
+        - "--audit-log-path=-"
+        - "--feature-gates=APIPriorityAndFairness=false"
+        - "--audit-log-maxage=0"
+        - "--audit-log-maxbackup=0"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
+      volumes:
+      - name: apiserver-certs
+        secret:
+          secretName: deviceapi
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: deviceapi
+  namespace: default
+  labels:
+    api: deviceapi
+    apiserver: "true"
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURrakNDQW5xZ0F3SUJBZ0lJVnk0emxGaURjSW93RFFZSktvWklodmNOQVFFTEJRQXdhVEVMTUFrR0ExVUUKQmhNQ2RXNHhDekFKQmdOVkJBZ01Bbk4wTVFvd0NBWURWUVFIREFGc01Rb3dDQVlEVlFRS0RBRnZNUXN3Q1FZRApWUVFMREFKdmRURW9NQ1lHQTFVRUF3d2ZaR1YyYVdObFlYQnBMV05sY25ScFptbGpZWFJsTFdGMWRHaHZjbWwwCmVUQWVGdzB5TWpBNU1EWXdNakl5TlRCYUZ3MHpNakE1TURNd01qSXlOVEJhTUNBeEhqQWNCZ05WQkFNVEZXUmwKZG1salpXRndhUzVrWldaaGRXeDBMbk4yWXpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQwpnZ0VCQUxWOHRENWJoc25GbytzK1I3VVBvd2hPeWg4b3BacnZMbzI1Vll3N25NbXlFY2theHZKekNOemkyNS9QCm1rekJwSDBSajdPcSs2VXdzV2EwVHRmMDRqT081Syt6ZkttT2N3MHE3T3VZRDM2MmRpdkhXa2VQRitOMXkvMmcKcHpuWkdJeXMvZ3Q4YU1iVDZmb0o0dElQRjRsSnltQnRjWGZqTklkOFZqUXZaNmtKNHQ2cFZtOCt6R3UvYkdhMQpINm4xV0FsN0xsYk9PSFNYNTZrQ1I3ZjdXUUl2QVNUTnpucVBDbi9HVVZ4Tnc0SmFVUEFEYWxXK3NpbnpiK01KCnRYbnFlVXRIbGtOamw2L0YwQWUyYjk4WGI3aUhhYVhYblNHUU1TTjZMRWIvTTBKcjhYOUVxR3NvTDlEOGtDdkMKNjZHT2YrTzdxc0EvV1Y4MmlNUzB0Z0gvMzFVQ0F3RUFBYU9CaGpDQmd6QU9CZ05WSFE4QkFmOEVCQU1DQmFBdwpIUVlEVlIwbEJCWXdGQVlJS3dZQkJRVUhBd0VHQ0NzR0FRVUZCd01DTUI4R0ExVWRJd1FZTUJhQUZPaDFZWENVCkJsTFEyZTBsRTJidEwxVEdrSGd2TURFR0ExVWRFUVFxTUNpQ0NXeHZZMkZzYUc5emRJSVZaR1YyYVdObFlYQnAKTG1SbFptRjFiSFF1YzNaamh3Ui9BQUFCTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFCK3N4T2UwYlF3UUREcApvQVFjNXNaSEhGaXJia0cvY0xJSjM3cE85RElrUzdRVlpDbEp1MGtPK1E3b05MTUt6dlBJT1NVNXp2L2U3Rkk1ClBjZFZMdC9zMFhmdDZZaU1MRytBRzNCRnE4dFh5WmRiMnhrdE41dVJvNk0xdkU1YTc2cHBMNkE2Z2NtVXpPMDQKWS9sYzF3UkJnQUMyc2dJSkkwUHduLyszWU9FYjBGWUJneXpvSnBFWkZ4QVAzd1d5cHVUODUzT1BIMjl6SDBHZQp6b0hYeXVpcm5HQnJvSnJXYzRiR01DM3Blc3Q5cnhyVHR4R2pPYlB1UGxnV0xrTFVaR2hVUmFvTXNidkM4QjhTCmtRVzl1WVdzYk1Eb1BGUXB2Yy9rajhqbU0vNUdicit3N284U1cvaGtvYmFTSWpSSTkwSG1xUGphNlRFNitoRFQKRy92cGxGWXEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb2dJQkFBS0NBUUVBdFh5MFBsdUd5Y1dqNno1SHRRK2pDRTdLSHlpbG11OHVqYmxWakR1Y3liSVJ5UnJHCjhuTUkzT0xibjgrYVRNR2tmUkdQczZyN3BUQ3haclJPMS9UaU00N2tyN044cVk1ekRTcnM2NWdQZnJaMks4ZGEKUjQ4WDQzWEwvYUNuT2RrWWpLeitDM3hveHRQcCtnbmkwZzhYaVVuS1lHMXhkK00waDN4V05DOW5xUW5pM3FsVwpiejdNYTc5c1pyVWZxZlZZQ1hzdVZzNDRkSmZucVFKSHQvdFpBaThCSk0zT2VvOEtmOFpSWEUzRGdscFE4QU5xClZiNnlLZk52NHdtMWVlcDVTMGVXUTJPWHI4WFFCN1p2M3hkdnVJZHBwZGVkSVpBeEkzb3NSdjh6UW12eGYwU28KYXlndjBQeVFLOExyb1k1LzQ3dXF3RDlaWHphSXhMUzJBZi9mVlFJREFRQUJBb0lCQUI4Mis2bGVCS2pmblhudwpsRlRJQTdxQ0VyR1pSQ0tKME8vL1dIOXVJV0Z2aHkrWHMzQXY2TzVVOW9GZUs2UFlDbnFZY3Fic1dhdm4zQnRXCkY5bDgvUXJ4SU5RM2d0R0c5ckxsRnlyT1ZKdnV0aFNCalQyUmx3SkFXSDJmRENRZSt1SDNQeHFxb3pyUGFBYmgKZkdtMHZzK1dLWUM4VWkvVW5FeFJUbUpiWlBEbHdER0tLelpzUlBNWStITVExWkYyT1F6THB1NGJxQWZ6aHgyNQpuc0ZCMjhkM3lDM0VMRU04Ny94SGQ1cUIveEN6aWZaaEtHbmF5eHlSUXpHZGREYS9kR3pESGhSSHJjY2tyaTlLCmhhUUVVUWk2RjcvUmtHdjZLNW9QVDAwSnFiNm1ZQTRRdzRJaHRsMEZzMGc1Rm5KQmhkY09VdTVBcmM5Y01QMHQKU2JoV053RUNnWUVBenNRWEkxUkJ1MTBsTDhjeHJ1Q2J1WFdNSE9Hc0VHY0F1T0FmMmpjT3BzK0w1ZjNybXA3OAo3R2srL29zVkVPM2l2eVJjR2c1VGhNRW9FUUEyRzI3SldUTzJTQVNsTmlNVE01MG1RYnZ3Uk15aDJBWUs0aVZ6CjZNVUNrUkV1RHFNMXNuck15elNaelVlZ1JBUDBiREZoNFpvUjJtNGdZZG9mS0hVR1RqWC9ONDBDZ1lFQTRMT3UKYjJtcjlPamJ2dnYyekh6RjJXQm90eDQ2TG9NUUJ2ZGhVNk51ZlV2UG9ML0VYQVk5anhJdU5TZzIyRTlkdFl0eQpTYXQwNERTN1l5NWxBSm8zbFMrUG14MEFHeFM2SHZYbkdPbXgzUXRDQ2ExbGhvaFF6T2Z3bEpJWDJRZzV1a2lWClF4TXduei9kcHpxYVlodzhEMGtHRVJSeVJSbXE1bDNrWkdZVGtPa0NnWUJEakNnSzhLR3d0aE5KOG9jMm5FWUQKWm5WcGtnZ0dLOEErcFdtQ2ZtNFk3TURGV0JpNklLcDhDVDM5Smk2eG95VnFVRlNPWnBPK1VPUG4rZXV6TnBRcwp3Z29RcVFQWUZjbFdHVWJBUHNlVmtreGxLRVF4OFE1V3d0VzkwcUQ3UXpKdHBsUjFKakFBc2grWFdMdG5CUkwzCkFzQkdYYWZTajlHU0Eva1ZYK3FLbVFLQmdHUDVyaWZtQlZzL2E5NHFyeUZHZHFVRUR6TkNZTEtuSDY5cHk4VHgKMTB3cU9lUVV6cUgvS002S1VVTFhkS2VEa0hjZzV5VytBbzlyQnVEWEdKdFBBbUgvT2s3U2RXU1hNVVJyTm5wUQpLQkhvVzJhQTNzWWZ5b3VRdXVydm9XcXdEVGRENmgxZzRXWkpmUzVWbGJFSFRQV2tFTzN5Z2ZFYXZYNG4wbUdWClJTbFpBb0dBV2ZmeXFtWWtNbS8zMEU1K0U3SVl2eE8yVUFidyt6LzlLWXZxMitVd0F0M1hkUGloRU1CWDZxVzYKTWd1c01hbk1oNms4WlFJQUhFWE05NUdWVXdQTUdiMWVtc21yeGo0bmNxci9IVy9ra0ZQQnkxWkJpeDN6bHBabgpMKzlpRmJCam01NVJGUEsxU3VIWWxhLytVNEdxdWFQVGpmYWIwL0FsbzZ6Sm8wcFBtMDQ9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deviceapi
+  namespace: default
+  labels:
+    api: deviceapi
+    apiserver: "true"
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    api: deviceapi
+    apiserver: "true"

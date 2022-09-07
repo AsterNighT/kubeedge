@@ -21,6 +21,8 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // DeviceSpec represents a single device instance. It is an instantation of a device model.
@@ -429,4 +431,37 @@ func (in *CustomizedValue) DeepCopy() *CustomizedValue {
 	out := new(CustomizedValue)
 	in.DeepCopyInto(out)
 	return out
+}
+
+// Interfaces required by apiserver runtime
+func (d *Device) GetObjectMeta() *metav1.ObjectMeta {
+	return &d.ObjectMeta
+}
+
+func (d *Device) NamespaceScoped() bool {
+	return true
+}
+
+func (d *Device) GetGroupVersionResource() schema.GroupVersionResource {
+	return schema.GroupVersionResource{
+		Group:    "devices.kubeedge.io",
+		Version:  "v1alpha2",
+		Resource: "devices",
+	}
+}
+
+func (d *Device) IsStorageVersion() bool {
+	return true
+}
+
+func (d *Device) New() runtime.Object {
+	return &Device{}
+}
+
+func (d *Device) NewList() runtime.Object {
+	return &DeviceList{}
+}
+
+func (in *DeviceList) GetListMeta() *metav1.ListMeta {
+	return &in.ListMeta
 }

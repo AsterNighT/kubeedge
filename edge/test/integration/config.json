@@ -1,0 +1,7 @@
+{
+        "mqttEndpoint":"tcp://127.0.0.1:1884",
+        "testManager": "http://127.0.0.1:12345",
+        "edgedEndpoint": "http://127.0.0.1:10350",
+        "image_url": ["nginx:latest", "redis:latest"],
+        "nodeId": "edge-node"
+}

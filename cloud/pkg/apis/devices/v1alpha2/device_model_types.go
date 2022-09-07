@@ -18,6 +18,9 @@ package v1alpha2
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/apiserver-runtime/pkg/builder/resource"
 )
 
 // DeviceModelSpec defines the model / template for a device.It is a blueprint which describes the device
@@ -141,8 +144,44 @@ type DeviceModel struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // DeviceModelList contains a list of DeviceModel
+
+var _ resource.Object = &DeviceModel{}
+
 type DeviceModelList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []DeviceModel `json:"items"`
+}
+
+// Interfaces required by apiserver runtime
+func (d *DeviceModel) GetObjectMeta() *metav1.ObjectMeta {
+	return &d.ObjectMeta
+}
+
+func (d *DeviceModel) NamespaceScoped() bool {
+	return true
+}
+
+func (d *DeviceModel) GetGroupVersionResource() schema.GroupVersionResource {
+	return schema.GroupVersionResource{
+		Group:    "devices.kubeedge.io",
+		Version:  "v1alpha2",
+		Resource: "devicemodels",
+	}
+}
+
+func (d *DeviceModel) IsStorageVersion() bool {
+	return true
+}
+
+func (d *DeviceModel) New() runtime.Object {
+	return &DeviceModel{}
+}
+
+func (d *DeviceModel) NewList() runtime.Object {
+	return &DeviceModelList{}
+}
+
+func (in *DeviceModelList) GetListMeta() *metav1.ListMeta {
+	return &in.ListMeta
 }
