@@ -383,7 +383,7 @@ release:
 	hack/make-rules/release.sh $(WHAT) $(ARM_VERSION)
 endif
 
-bin/apiserver: cloud/cmd/apiserver/main.go
+cloud/bin/apiserver: cloud/cmd/apiserver/main.go
 	go build -o cloud/bin/apiserver cloud/cmd/apiserver/main.go
 
 apiserver-image: cloud/bin/apiserver
