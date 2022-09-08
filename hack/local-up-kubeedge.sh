@@ -138,7 +138,7 @@ function start_edgecore {
   ${EDGE_BIN} --defaultconfig >  ${EDGE_CONFIGFILE}
 
   sed -i '/edgeStream:/{n;s/false/true/;}' ${EDGE_CONFIGFILE}
-  sed -i 's/cgroupfs/systemd/g' ${EDGE_CONFIGFILE}
+  # sed -i 's/cgroupfs/systemd/g' ${EDGE_CONFIGFILE}
   token=`kubectl get secret -nkubeedge tokensecret -o=jsonpath='{.data.tokendata}' | base64 -d`
 
   sed -i -e "s|token: .*|token: ${token}|g" \
