@@ -223,7 +223,7 @@ build_edgecore
 
 kind_up_cluster
 
-cp /etc/kubernetes/admin.conf $HOME/.kube/config
+# cp /etc/kubernetes/admin.conf $HOME/.kube/config
 export KUBECONFIG=$HOME/.kube/config
 
 check_control_plane_ready
