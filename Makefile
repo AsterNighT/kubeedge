@@ -49,7 +49,7 @@ ifeq ($(HELP),y)
 all: clean
 	@echo "$$ALL_HELP_INFO"
 else
-all: 
+all:
 	KUBEEDGE_OUTPUT_SUBPATH=$(OUT_DIR) hack/make-rules/build.sh $(WHAT)
 endif
 
@@ -178,7 +178,7 @@ ifeq ($(HELP),y)
 crossbuild:
 	@echo "$$CROSSBUILD_HELP_INFO"
 else
-crossbuild: 
+crossbuild:
 	hack/make-rules/crossbuild.sh $(WHAT) $(ARM_VERSION)
 endif
 
@@ -198,7 +198,7 @@ define GENERATE_CRDS_HELP_INFO
 #     RELIABLESYNCS_VERSION, default: v1alpha1
 #
 # Example:
-#     make generate 
+#     make generate
 #     make generate -e CRD_VERSIONS=v1 -e CRD_OUTPUTS=build/crds
 #
 endef
@@ -231,7 +231,7 @@ ifeq ($(HELP),y)
 smallbuild:
 	@echo "$$SMALLBUILD_HELP_INFO"
 else
-smallbuild: 
+smallbuild:
 	hack/make-rules/smallbuild.sh $(WHAT)
 endif
 
