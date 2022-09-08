@@ -370,6 +370,7 @@ type VisitorConfigCustomized struct {
 
 // Device is the Schema for the devices API
 // +k8s:openapi-gen=true
+// resource:path=devices
 type Device struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

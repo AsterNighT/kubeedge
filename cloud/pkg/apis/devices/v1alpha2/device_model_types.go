@@ -134,6 +134,7 @@ const (
 
 // DeviceModel is the Schema for the device model API
 // +k8s:openapi-gen=true
+// resource:path=devicemodels
 type DeviceModel struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
