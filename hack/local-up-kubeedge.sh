@@ -233,7 +233,7 @@ kubectl delete daemonset kindnet -nkube-system
 kubectl create ns kubeedge
 
 ensure_apiserver
-create_device_crd
+# create_device_crd
 create_objectsync_crd
 create_rule_crd
 
