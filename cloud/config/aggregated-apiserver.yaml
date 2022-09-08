@@ -21,7 +21,8 @@ spec:
     spec:
       containers:
       - name: apiserver
-        image: 10.10.101.109:5000/apiserver:latest
+        image: test/apiserver
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: apiserver-certs
           mountPath: /apiserver.local.config/certificates

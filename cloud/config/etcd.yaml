@@ -63,7 +63,7 @@ spec:
   - metadata:
      name: etcd-data-dir
     spec:
-      storageClassName: local-storage
+      storageClassName: standard
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:

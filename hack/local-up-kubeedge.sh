@@ -65,6 +65,24 @@ else
   trap cleanup INT
 fi
 
+function ensure_apiserver {
+  echo "creating device apiserver..."
+
+  export DOCKER_REGISTRY=""
+
+  export APISERVER_IMAGE_TAG="test/apiserver"
+
+  make apiserver-image
+  kind load docker-image ${CLUSTER_CONTEXT} ${DOCKER_REGISTRY}${APISERVER_IMAGE_TAG}
+  kubectl apply -f ${KUBEEDGE_ROOT}/cloud/config
+
+  # ensure apiserver is ready
+  while true; do
+      sleep 3
+      kubectl get apiservice | grep v1alpha2.devices.kubeedge.io | awk '{print $3}' | grep True && break
+  done
+}
+
 function create_device_crd {
   echo "creating the device crd..."
   kubectl apply -f ${KUBEEDGE_ROOT}/build/crds/devices/devices_v1alpha2_device.yaml
@@ -120,6 +138,7 @@ function start_edgecore {
   ${EDGE_BIN} --defaultconfig >  ${EDGE_CONFIGFILE}
 
   sed -i '/edgeStream:/{n;s/false/true/;}' ${EDGE_CONFIGFILE}
+  sed -i 's/cgroupfs/systemd/g' ${EDGE_CONFIGFILE}
   token=`kubectl get secret -nkubeedge tokensecret -o=jsonpath='{.data.tokendata}' | base64 -d`
 
   sed -i -e "s|token: .*|token: ${token}|g" \
@@ -204,6 +223,7 @@ build_edgecore
 
 kind_up_cluster
 
+cp /etc/kubernetes/admin.conf $HOME/.kube/config
 export KUBECONFIG=$HOME/.kube/config
 
 check_control_plane_ready
@@ -212,6 +232,7 @@ check_control_plane_ready
 kubectl delete daemonset kindnet -nkube-system
 kubectl create ns kubeedge
 
+ensure_apiserver
 create_device_crd
 create_objectsync_crd
 create_rule_crd

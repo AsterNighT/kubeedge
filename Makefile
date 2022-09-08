@@ -4,6 +4,10 @@ INSTALL_DIR?=${DESTDIR}${USR_DIR}
 INSTALL_BIN_DIR?=${INSTALL_DIR}/bin
 GOPATH?=$(shell go env GOPATH)
 
+DOCKER_REGISTRY ?= "10.10.101.109:5000"
+
+APISERVER_IMAGE_TAG ?= "apiserver"
+
 # make all builds both cloud and edge binaries
 
 BINARIES=cloudcore \
@@ -378,3 +382,12 @@ else
 release:
 	hack/make-rules/release.sh $(WHAT) $(ARM_VERSION)
 endif
+
+bin/apiserver: cloud/cmd/apiserver/main.go
+	go build -o cloud/bin/apiserver cloud/cmd/apiserver/main.go
+
+apiserver-image: cloud/bin/apiserver
+	docker build cloud -t ${DOCKER_REGISTRY}${APISERVER_IMAGE_TAG}
+
+apiserver-image-push: apiserver-image
+	docker push ${DOCKER_REGISTRY}${APISERVER_IMAGE_TAG}

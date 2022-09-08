@@ -598,7 +598,10 @@ func HandleDeviceModel(operation string, apiserver string, UID string, protocolT
 		return false, 0
 	}
 	defer resp.Body.Close()
+	buf := new(strings.Builder)
+	_, _ = io.Copy(buf, resp.Body)
 	Infof("%s %s %v in %v", req.Method, req.URL, resp.Status, time.Since(t))
+	Infof("Response: %s", buf)
 	return true, resp.StatusCode
 }
 
@@ -648,7 +651,10 @@ func HandleDeviceInstance(operation string, apiserver string, nodeSelector strin
 		return false, 0
 	}
 	defer resp.Body.Close()
+	buf := new(strings.Builder)
+	_, _ = io.Copy(buf, resp.Body)
 	Infof("%s %s %v in %v", req.Method, req.URL, resp.Status, time.Since(t))
+	Infof("Response: %s", buf)
 	return true, resp.StatusCode
 }
 
